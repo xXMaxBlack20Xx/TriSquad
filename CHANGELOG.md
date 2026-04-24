@@ -3,6 +3,18 @@
 All notable Tri_Squad changes are recorded here. Release detail files live in
 `.ai/releases/`.
 
+## Unreleased
+
+### Added
+
+- Repo-managed `scripts/ai-project-init` command for initializing any git
+  project with the Tri_Squad AI workspace.
+- Repo-managed `scripts/trisquad` command for initializing and launching Claude
+  Squad from a project root.
+- `scripts/install-trisquad` for installing the global template and launcher
+  commands into `~/.config/ai-project-template` and `~/.local/bin`.
+- Template `.ai/README.md` and `GEMINI.md` placeholder for installed templates.
+
 ## v0.1.0 - 2026-04-24
 
 Initial usable Tri_Squad template release.

@@ -6,8 +6,8 @@ TBD
 
 ## Active tasks
 
-| ID | Owner | Branch | Status | Summary |
-|---|---|---|---|---|
+| ID | Owner | Profile | Branch/Worktree | Status | Summary |
+|---|---|---|---|---|---|
 
 ## Blockers
 
