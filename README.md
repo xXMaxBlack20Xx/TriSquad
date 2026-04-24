@@ -1,46 +1,190 @@
-# Tri_Squad
+# TriSquad
 
-Tri_Squad is a Fedora-first multi-agent development template. It coordinates
-Codex, Gemini, and Qwen through Git branches plus the `.ai/` task board,
-outputs, status files, and handoffs.
+```text
+ _______     _  _____                 _
+|__   __|   (_)/ ____|               | |
+   | |_ __  _| (___   __ _ _   _  __| |
+   | | '__|| |\___ \ / _` | | | |/ _` |
+   | | |   | |____) | (_| | |_| | (_| |
+   |_|_|   |_|_____/ \__, |\__,_|\__,_|
+                         | |
+                         |_|
+```
 
-The repository currently provides the operating layer for future projects. It
-does not yet contain a generated React, NestJS, Expo, or Docusaurus app.
+**Version:** `v0.2.0`
 
-## Quick Start
+TriSquad is a reusable multi-agent project launcher for git repositories. You
+enter any project, run `trisquad`, and get a shared AI workspace plus Claude
+Squad sessions for Codex, Gemini, Qwen, and a normal shell.
 
-1. Read `AGENTS.md`, `.ai/CONTEXT.md`, and `.ai/BOARD.md`.
-2. Create a task branch with `git checkout -b task/<task-id>-<agent-name>`.
-3. Put task prompts in `.ai/tasks/`.
-4. Delegate non-interactive work with `scripts/delegate-agent`.
-5. Require each agent to write its final report to `.ai/outputs/`.
-6. Write cross-agent context transfers under `.ai/handoffs/`.
-7. Update `.ai/BOARD.md` before and after delegation.
-8. Document verification before merge.
+## Purpose
+
+TriSquad solves the setup problem for multi-agent development. Instead of
+recreating `AGENTS.md`, `GEMINI.md`, task boards, handoffs, and status folders
+for every project, TriSquad installs one reusable template and one launcher
+command.
+
+The target workflow is:
+
+```text
+Enter any git project
+        |
+Run: trisquad
+        |
+TriSquad initializes shared AI context if needed
+        |
+Claude Squad opens from the project root
+        |
+Launch Codex, Gemini, Qwen, or shell sessions
+```
+
+## How It Works
+
+TriSquad has three layers:
+
+- **Global Claude Squad config:** `~/.claude-squad/config.json`
+  Defines launch profiles such as `codex-lead`, `gemini-architect`,
+  `qwen-local-chat`, and `shell`.
+- **Reusable project template:** `~/.config/ai-project-template/`
+  Stores the template files copied into each project.
+- **Launcher commands:** `~/.local/bin/trisquad` and
+  `~/.local/bin/ai-project-init`
+  Initialize project context and launch Claude Squad.
+
+## Requirements
+
+Install and verify these commands are available on `PATH`:
+
+```bash
+which cs
+which codex
+which gemini
+which ollama
+which tmux
+which git
+```
+
+For Qwen, the default profile expects this Ollama model:
+
+```bash
+ollama list
+```
+
+Expected model:
+
+```text
+qwen2.5-coder:7b
+```
+
+## Install TriSquad
+
+From this repository:
+
+```bash
+scripts/install-trisquad
+```
+
+This installs:
+
+- `~/.config/ai-project-template`
+- `~/.local/bin/ai-project-init`
+- `~/.local/bin/trisquad`
+
+Make sure `~/.local/bin` is on `PATH`:
+
+```bash
+echo "$PATH"
+```
+
+If it is missing:
+
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+## Use It
+
+For a new project:
+
+```bash
+mkdir my-project
+cd my-project
+git init
+trisquad
+```
+
+For an existing project:
+
+```bash
+cd my-project
+trisquad
+```
+
+From a nested folder:
+
+```bash
+cd my-project/src/some/deep/folder
+trisquad
+```
+
+`trisquad` automatically moves to the git root before launching Claude Squad.
+
+## What Gets Created
+
+On first run inside a project, TriSquad creates:
+
+```text
+AGENTS.md
+GEMINI.md -> AGENTS.md
+.ai/
+  BOARD.md
+  CONTEXT.md
+  DECISIONS.md
+  README.md
+  tasks/
+  status/
+  outputs/
+  handoffs/
+  logs/
+  decisions/
+  releases/
+scripts/
+  delegate-agent
+```
+
+Existing files are skipped by default. Use `ai-project-init --force` only when
+you intentionally want to refresh managed template files.
 
 ## Agent Roles
 
-- **Codex Lead:** implementation, integration, tests, refactors, code review before merge, and task decomposition.
-- **Gemini Reviewer / Architect:** architecture review, long-context analysis, documentation, alternative designs, and risk analysis.
-- **Qwen Local Assistant:** cheap local review, documentation drafts, naming suggestions, simple refactor proposals, and offline brainstorming.
+- **Codex Lead:** implementation, integration, tests, refactors, code review
+  before merge, and task decomposition.
+- **Gemini Architect:** architecture review, long-context analysis,
+  documentation, alternative designs, and risk analysis.
+- **Qwen Local Reviewer:** cheap local review, documentation drafts, naming
+  suggestions, simple refactor proposals, and offline brainstorming.
+- **Shell:** normal terminal work for commands and inspection.
 
 Do not use local Qwen as the only source for sensitive security review unless
 the model and findings are manually verified.
 
-## Communication Files
+## Shared Context Files
 
-- `.ai/BOARD.md`: current objective, task ownership, blockers, and integration queue.
-- `.ai/CONTEXT.md`: durable project context that every agent should read first.
-- `.ai/DECISIONS.md`: architecture and workflow decisions.
+- `.ai/BOARD.md`: active work, owners, branches/worktrees, blockers, and
+  integration queue.
+- `.ai/CONTEXT.md`: project stack, architecture, directories, milestone, and
+  notes for agents.
+- `.ai/DECISIONS.md`: durable architecture and workflow decisions.
 - `.ai/tasks/`: prompts for delegated work.
-- `.ai/outputs/`: generated agent reports.
-- `.ai/status/`: current agent status files.
-- `.ai/handoffs/`: structured cross-agent handoffs.
-- `.ai/logs/`: raw delegate command logs.
+- `.ai/outputs/`: final agent reports.
+- `.ai/status/`: latest agent status files.
+- `.ai/handoffs/`: structured agent-to-agent context transfers.
+- `.ai/logs/`: raw delegation command logs.
 
 ## Delegation
 
-Use:
+Inside an initialized project:
 
 ```bash
 scripts/delegate-agent <codex|gemini|qwen> <task-id> <prompt-file>
@@ -52,46 +196,34 @@ Example:
 scripts/delegate-agent qwen T005 .ai/tasks/T005-qwen-review.md
 ```
 
-After every delegation, update `.ai/BOARD.md` with the owner, branch, status,
-and expected output file.
+Every delegated task should write its final report to
+`.ai/outputs/<task-id>-<agent>.md`.
 
-## Launcher Commands
-
-Install the reusable template and commands:
-
-```bash
-scripts/install-trisquad
-```
-
-Then run from any git project:
-
-```bash
-trisquad
-```
-
-`trisquad` moves to the project root, initializes the AI workspace if needed,
-and opens Claude Squad. `ai-project-init` can also be run directly when you
-only want to add `AGENTS.md`, `GEMINI.md`, and `.ai/` context files.
-
-## Starter Template
-
-`templates/agent-project/` contains a clean starting layout for new projects
-that want the same agent workflow without inheriting this repository's runtime
-logs or prior task history.
-
-## Releases
+## Release History
 
 Release history is tracked in `CHANGELOG.md`, with detailed release records in
 `.ai/releases/`.
 
+Current version: `v0.2.0`, which adds the `trisquad` launcher workflow.
+
 ## Verification
 
-For app projects, the default Definition of Done is:
+This repository is a shell/template project, so verification focuses on script
+syntax and launcher smoke tests:
+
+```bash
+bash -n scripts/ai-project-init
+bash -n scripts/trisquad
+bash -n scripts/install-trisquad
+bash -n scripts/delegate-agent
+git diff --check
+```
+
+For projects initialized by TriSquad, replace the placeholder verification
+commands in `AGENTS.md` with project-specific commands such as:
 
 ```bash
 npm run lint
 npm test
+npm run build
 ```
-
-This orchestration template has no Node project yet, so verification starts with
-shell syntax checks and documentation review until app tooling is added.
