@@ -22,7 +22,7 @@ None.
 
 ## Integration queue
 
-PR #1 merged: https://github.com/xXMaxBlack20Xx/TriSquad/pull/1
+PR #1 merged: <https://github.com/xXMaxBlack20Xx/TriSquad/pull/1>
 
 Version `v0.1.0` is the first Tri_Squad template release. Version `v0.2.0`
 documents and adds the `trisquad` launcher workflow. Current T005 is

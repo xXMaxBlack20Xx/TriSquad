@@ -1,21 +1,17 @@
 # TriSquad
 
 ```text
- _______     _  _____                 _
-|__   __|   (_)/ ____|               | |
-   | |_ __  _| (___   __ _ _   _  __| |
-   | | '__|| |\___ \ / _` | | | |/ _` |
-   | | |   | |____) | (_| | |_| | (_| |
-   |_|_|   |_|_____/ \__, |\__,_|\__,_|
-                         | |
-                         |_|
+ ████████╗ ██████╗  ██╗  ██████╗  ██████╗  ██╗   ██╗  █████╗  ██████╗
+ ╚══██╔══╝ ██╔══██╗ ██║  ██╔═══╝ ██╔═══██╗ ██║   ██║ ██╔══██╗ ██╔══██╗
+    ██║    ██████╔╝ ██║  ╚█████╗ ██║   ██║ ██║   ██║ ███████║ ██║  ██║
+    ██║    ██╔══██╗ ██║   ╚═══██╗██║▄▄ ██║ ██║   ██║ ██╔══██║ ██║  ██║
+    ██║    ██║  ██║ ██║  ██████╔╝╚██████╔╝ ╚██████╔╝ ██║  ██║ ██████╔╝
+    ╚═╝    ╚═╝  ╚═╝ ╚═╝  ╚═════╝  ╚══▀▀═╝   ╚═════╝  ╚═╝  ╚═╝ ╚═════╝
 ```
 
 **Version:** `v0.2.0`
 
-TriSquad is a reusable multi-agent project launcher for git repositories. You
-enter any project, run `trisquad`, and get a shared AI workspace plus Claude
-Squad sessions for Codex, Gemini, Qwen, and a normal shell.
+TriSquad is a reusable multi-agent launcher for Git repositories. Enter any project directory, run trisquad, and instantly deploy a shared AI workspace. It features Claude Squad sessions for Codex, Gemini, and Qwen, alongside a standard shell or any AI agent of your choosing.
 
 ## Purpose
 
