@@ -2,9 +2,9 @@
 
 ## Current objective
 
-Bootstrap Tri_Squad into a clean reusable multi-agent project template with
-explicit handoffs, documented roles, branch discipline, and verification gates.
-Prepare the first traceable release as `v0.1.0`.
+Maintain Tri_Squad as a clean reusable multi-agent project template with
+explicit handoffs, documented roles, branch discipline, release history, and
+verification gates.
 
 ## Active tasks
 
@@ -13,7 +13,7 @@ Prepare the first traceable release as `v0.1.0`.
 | T004 | Codex Lead | task/T004-codex-template-bootstrap | Complete | Added project template docs, handoff conventions, branch/bootstrap files, and delegation hardening. |
 | T005 | Qwen | task/T004-codex-template-bootstrap | Inconclusive | Delegated through Ollama; output was procedural, not a concrete review. |
 | T006 | Gemini | task/T004-codex-template-bootstrap | Blocked | Gemini CLI requested interactive browser authentication during non-interactive delegation. |
-| T007 | Codex Lead | task/T004-codex-template-bootstrap | In progress | Add release tracking and merge first Tri_Squad version. |
+| T007 | Codex Lead | task/T004-codex-template-bootstrap | Complete | Added release tracking and merged first Tri_Squad version. |
 
 ## Blockers
 
@@ -21,10 +21,11 @@ None.
 
 ## Integration queue
 
-Draft PR: https://github.com/xXMaxBlack20Xx/TriSquad/pull/1
+PR #1 merged: https://github.com/xXMaxBlack20Xx/TriSquad/pull/1
 
-User approved merging the first version with Qwen/Gemini review gaps documented.
-Current T005 is inconclusive and T006 is blocked by Gemini authentication.
+Version `v0.1.0` is the first Tri_Squad template release. User approved merging
+with Qwen/Gemini review gaps documented. Current T005 is inconclusive and T006
+is blocked by Gemini authentication.
 
 ## Rules
 
