@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+TEMPLATE_SRC="$ROOT/templates/agent-project"
+TEMPLATE_DST="${TRISQUAD_TEMPLATE_DIR:-$HOME/.config/ai-project-template}"
+BIN_DIR="${TRISQUAD_BIN_DIR:-$HOME/.local/bin}"
+CLAUDE_SQUAD_DIR="$HOME/.claude-squad"
+CLAUDE_SQUAD_CONFIG="$CLAUDE_SQUAD_DIR/config.json"
+
+if [[ ! -d "$TEMPLATE_SRC" ]]; then
+  echo "Error: template source not found: $TEMPLATE_SRC" >&2
+  exit 1
+fi
+
+mkdir -p "$TEMPLATE_DST" "$BIN_DIR" "$CLAUDE_SQUAD_DIR"
+cp -R "$TEMPLATE_SRC"/. "$TEMPLATE_DST"/
+cp "$ROOT/scripts/ai-project-init" "$BIN_DIR/ai-project-init"
+cp "$ROOT/scripts/trisquad" "$BIN_DIR/trisquad"
+chmod +x "$BIN_DIR/ai-project-init" "$BIN_DIR/trisquad"
+
+if [[ ! -f "$CLAUDE_SQUAD_CONFIG" ]]; then
+  cat > "$CLAUDE_SQUAD_CONFIG" <<'EOF'
+{
+  "default_program": "codex-lead",
+  "profiles": [
+    {
+      "name": "codex-lead",
+      "program": "codex"
+    },
+    {
+      "name": "gemini-architect",
+      "program": "gemini"
+    },
+    {
+      "name": "qwen-local-chat",
+      "program": "ollama run qwen2.5-coder:7b"
+    },
+    {
+      "name": "shell",
+      "program": "bash"
+    }
+  ]
+}
+EOF
+  echo "Created $CLAUDE_SQUAD_CONFIG"
+else
+  echo "Skipped $CLAUDE_SQUAD_CONFIG because it already exists"
+fi
+
+echo "Installed template: $TEMPLATE_DST"
+echo "Installed commands:"
+echo "  $BIN_DIR/ai-project-init"
+echo "  $BIN_DIR/trisquad"
+echo
+echo "Make sure this directory is in PATH:"
+echo "  $BIN_DIR"

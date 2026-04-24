@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TEMPLATE_DIR="${TRISQUAD_TEMPLATE_DIR:-$HOME/.config/ai-project-template}"
+
+usage() {
+  cat <<'EOF'
+Usage: ai-project-init [--force]
+
+Initialize the current git repository with the Tri_Squad AI workspace.
+
+Options:
+  --force   Replace managed template files if they already exist.
+EOF
+}
+
+FORCE=0
+for arg in "$@"; do
+  case "$arg" in
+    --force)
+      FORCE=1
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $arg" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+require_command() {
+  local cmd="$1"
+
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "Error: required command not found: $cmd" >&2
+    exit 127
+  fi
+}
+
+copy_if_missing() {
+  local src="$1"
+  local dst="$2"
+
+  if [[ ! -e "$src" ]]; then
+    echo "Error: template file not found: $src" >&2
+    exit 1
+  fi
+
+  mkdir -p "$(dirname "$dst")"
+
+  if [[ "$FORCE" -eq 1 || ! -e "$dst" ]]; then
+    cp "$src" "$dst"
+    echo "Created $dst"
+  else
+    echo "Skipped $dst because it already exists"
+  fi
+}
+
+require_command git
+require_command cp
+require_command ln
+
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "Error: run this inside a git repository." >&2
+  echo >&2
+  echo "Fix:" >&2
+  echo "  git init" >&2
+  echo "  ai-project-init" >&2
+  exit 1
+fi
+
+if [[ ! -d "$TEMPLATE_DIR" ]]; then
+  echo "Error: template directory not found: $TEMPLATE_DIR" >&2
+  echo >&2
+  echo "Install it first, or set TRISQUAD_TEMPLATE_DIR to a valid template path." >&2
+  exit 1
+fi
+
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+cd "$PROJECT_ROOT"
+
+mkdir -p .ai/{tasks,status,outputs,handoffs,logs,decisions,releases}
+
+copy_if_missing "$TEMPLATE_DIR/AGENTS.md" "AGENTS.md"
+
+if [[ "$FORCE" -eq 1 && -e GEMINI.md && ! -L GEMINI.md ]]; then
+  echo "Skipped GEMINI.md because it exists and is not a symlink"
+elif [[ ! -e GEMINI.md ]]; then
+  ln -s AGENTS.md GEMINI.md
+  echo "Created GEMINI.md symlink -> AGENTS.md"
+else
+  echo "Skipped GEMINI.md because it already exists"
+fi
+
+copy_if_missing "$TEMPLATE_DIR/.ai/BOARD.md" ".ai/BOARD.md"
+copy_if_missing "$TEMPLATE_DIR/.ai/CONTEXT.md" ".ai/CONTEXT.md"
+copy_if_missing "$TEMPLATE_DIR/.ai/DECISIONS.md" ".ai/DECISIONS.md"
+copy_if_missing "$TEMPLATE_DIR/.ai/README.md" ".ai/README.md"
+
+if [[ -f "$TEMPLATE_DIR/.ai/handoffs/HANDOFF_TEMPLATE.md" ]]; then
+  copy_if_missing "$TEMPLATE_DIR/.ai/handoffs/HANDOFF_TEMPLATE.md" ".ai/handoffs/HANDOFF_TEMPLATE.md"
+fi
+
+if [[ -f "$TEMPLATE_DIR/.ai/tasks/TASK_TEMPLATE.md" ]]; then
+  copy_if_missing "$TEMPLATE_DIR/.ai/tasks/TASK_TEMPLATE.md" ".ai/tasks/TASK_TEMPLATE.md"
+fi
+
+if [[ -f "$TEMPLATE_DIR/scripts/delegate-agent" ]]; then
+  copy_if_missing "$TEMPLATE_DIR/scripts/delegate-agent" "scripts/delegate-agent"
+  chmod +x scripts/delegate-agent
+fi
+
+touch .ai/tasks/.gitkeep .ai/status/.gitkeep .ai/outputs/.gitkeep \
+  .ai/handoffs/.gitkeep .ai/logs/.gitkeep .ai/decisions/.gitkeep \
+  .ai/releases/.gitkeep
+
+echo
+echo "AI project template initialized in:"
+echo "$PROJECT_ROOT"
+echo
+echo "Next:"
+echo "  trisquad"

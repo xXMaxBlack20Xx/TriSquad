@@ -1,14 +1,15 @@
 # Agent Operating Guide
 
-## Project Goal
+## Project Objective
 
 Replace this section with the project goal.
 
 ## Agent Roles
 
 - **Codex Lead:** implementation, integration, tests, refactors, code review before merge, and task decomposition.
-- **Gemini Reviewer / Architect:** architecture review, long-context analysis, documentation, alternative designs, and risk analysis.
-- **Qwen Local Assistant:** cheap local review, documentation drafts, naming suggestions, simple refactor proposals, and offline brainstorming.
+- **Gemini Architect:** architecture review, long-context analysis, documentation, alternative designs, and risk analysis.
+- **Qwen Local Reviewer:** cheap local review, documentation drafts, naming suggestions, simple refactor proposals, and offline brainstorming.
+- **Shell:** normal terminal work for commands and inspection.
 
 Do not rely on local Qwen alone for sensitive security review unless the local
 model is strong enough and the findings are manually verified.
@@ -55,3 +56,13 @@ Anything uncertain or unsafe.
 - [ ] Documentation is updated.
 - [ ] Final output is written to `.ai/outputs/<task-id>-<agent>.md`.
 - [ ] Verification steps are documented before merge.
+
+## Verification Commands
+
+Replace these placeholders with project-specific commands:
+
+```bash
+npm run lint
+npm test
+npm run build
+```

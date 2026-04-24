@@ -14,6 +14,7 @@ verification gates.
 | T005 | Qwen | task/T004-codex-template-bootstrap | Inconclusive | Delegated through Ollama; output was procedural, not a concrete review. |
 | T006 | Gemini | task/T004-codex-template-bootstrap | Blocked | Gemini CLI requested interactive browser authentication during non-interactive delegation. |
 | T007 | Codex Lead | task/T004-codex-template-bootstrap | Complete | Added release tracking and merged first Tri_Squad version. |
+| T008 | Codex Lead | task/T008-codex-trisquad-launcher | Complete | Added reusable `ai-project-init`, `trisquad`, and installer commands. |
 
 ## Blockers
 

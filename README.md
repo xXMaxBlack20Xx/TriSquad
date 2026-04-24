@@ -55,6 +55,24 @@ scripts/delegate-agent qwen T005 .ai/tasks/T005-qwen-review.md
 After every delegation, update `.ai/BOARD.md` with the owner, branch, status,
 and expected output file.
 
+## Launcher Commands
+
+Install the reusable template and commands:
+
+```bash
+scripts/install-trisquad
+```
+
+Then run from any git project:
+
+```bash
+trisquad
+```
+
+`trisquad` moves to the project root, initializes the AI workspace if needed,
+and opens Claude Squad. `ai-project-init` can also be run directly when you
+only want to add `AGENTS.md`, `GEMINI.md`, and `.ai/` context files.
+
 ## Starter Template
 
 `templates/agent-project/` contains a clean starting layout for new projects

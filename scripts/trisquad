@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v git >/dev/null 2>&1; then
+  echo "Error: git is required." >&2
+  exit 127
+fi
+
+if ! command -v cs >/dev/null 2>&1; then
+  echo "Error: Claude Squad command not found: cs" >&2
+  echo >&2
+  echo "Make sure ~/.local/bin is in PATH and Claude Squad is installed." >&2
+  exit 127
+fi
+
+if ! command -v ai-project-init >/dev/null 2>&1; then
+  echo "Error: ai-project-init command not found." >&2
+  echo >&2
+  echo "Install Tri_Squad launchers into ~/.local/bin first." >&2
+  exit 127
+fi
+
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "Error: trisquad must be run inside a git repository." >&2
+  echo >&2
+  echo "Fix:" >&2
+  echo "  git init" >&2
+  echo "  trisquad" >&2
+  exit 1
+fi
+
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+cd "$PROJECT_ROOT"
+
+if [[ ! -f AGENTS.md || ! -e GEMINI.md || ! -d .ai || ! -f .ai/BOARD.md || ! -f .ai/CONTEXT.md || ! -f .ai/DECISIONS.md ]]; then
+  echo "No complete AI project template found."
+  echo "Initializing project AI workspace..."
+  ai-project-init
+fi
+
+exec cs
