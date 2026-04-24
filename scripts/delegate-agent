@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AGENT="${1:-}"
+TASK_ID="${2:-}"
+PROMPT_FILE="${3:-}"
+
+if [[ -z "$AGENT" || -z "$TASK_ID" || -z "$PROMPT_FILE" ]]; then
+  echo "Usage: scripts/delegate-agent <codex|gemini|qwen> <task-id> <prompt-file>"
+  exit 1
+fi
+
+if [[ ! "$TASK_ID" =~ ^[A-Za-z0-9._-]+$ ]]; then
+  echo "Invalid task id: $TASK_ID"
+  echo "Task ids may only contain letters, numbers, dots, underscores, and dashes."
+  exit 1
+fi
+
+ROOT="$(git rev-parse --show-toplevel)"
+OUT_DIR="$ROOT/.ai/outputs"
+LOG_DIR="$ROOT/.ai/logs"
+STATUS_DIR="$ROOT/.ai/status"
+
+mkdir -p "$OUT_DIR" "$LOG_DIR" "$STATUS_DIR"
+
+if [[ "$PROMPT_FILE" = /* ]]; then
+  PROMPT_PATH="$PROMPT_FILE"
+else
+  PROMPT_PATH="$ROOT/$PROMPT_FILE"
+fi
+
+if [[ ! -f "$PROMPT_PATH" ]]; then
+  echo "Prompt file not found: $PROMPT_PATH"
+  exit 1
+fi
+
+OUT_FILE="$OUT_DIR/${TASK_ID}-${AGENT}.md"
+LOG_FILE="$LOG_DIR/${TASK_ID}-${AGENT}.log"
+STATUS_FILE="$STATUS_DIR/${AGENT}.md"
+BRANCH="$(git -C "$ROOT" branch --show-current || true)"
+PROMPT="$(cat "$PROMPT_PATH")"
+
+write_status() {
+  local state="$1"
+  local timestamp="$2"
+  local exit_code="${3:-}"
+
+  {
+    echo "# Status: $AGENT"
+    echo
+    echo "- Task: $TASK_ID"
+    echo "- Branch: ${BRANCH:-unknown}"
+    echo "- Prompt: $PROMPT_PATH"
+    echo "- State: $state"
+    echo "- Timestamp: $timestamp"
+    if [[ -n "$exit_code" ]]; then
+      echo "- Exit code: $exit_code"
+    fi
+    echo "- Output: $OUT_FILE"
+    echo "- Log: $LOG_FILE"
+  } > "$STATUS_FILE"
+}
+
+case "$AGENT" in
+  codex)
+    REQUIRED_COMMAND="codex"
+    ;;
+  gemini)
+    REQUIRED_COMMAND="gemini"
+    ;;
+  qwen)
+    REQUIRED_COMMAND="ollama"
+    ;;
+  *)
+    echo "Unknown agent: $AGENT"
+    exit 1
+    ;;
+esac
+
+write_status "running" "$(date -Iseconds)"
+
+if ! command -v "$REQUIRED_COMMAND" >/dev/null 2>&1; then
+  {
+    echo "Missing required command: $REQUIRED_COMMAND"
+    echo "Install or configure $REQUIRED_COMMAND before delegating to $AGENT."
+  } > "$LOG_FILE"
+  write_status "failed" "$(date -Iseconds)" "127"
+  exit 127
+fi
+
+STATE="failed"
+finish_status() {
+  local exit_code="$?"
+  if [[ "$STATE" != "done" ]]; then
+    write_status "failed" "$(date -Iseconds)" "$exit_code"
+  fi
+}
+trap finish_status EXIT
+
+case "$AGENT" in
+  codex)
+    codex exec "$PROMPT" 2>"$LOG_FILE" | tee "$OUT_FILE"
+    ;;
+
+  gemini)
+    gemini -p "$PROMPT" 2>"$LOG_FILE" | tee "$OUT_FILE"
+    ;;
+
+  qwen)
+    ollama run qwen2.5-coder:7b "$PROMPT" 2>"$LOG_FILE" | tee "$OUT_FILE"
+    ;;
+esac
+
+STATE="done"
+write_status "done" "$(date -Iseconds)"
+trap - EXIT
+
+echo "Delegation complete. Update .ai/BOARD.md and any required .ai/handoffs/ file." >&2

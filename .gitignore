@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.npm/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+coverage/
+.next/
+.expo/
+.docusaurus/
+
+# Local environment and editor state
+.env
+.env.*
+!.env.example
+.direnv/
+.vscode/
+.idea/
+*.log
+
+# AI runtime artifacts
+.ai/logs/*
+!.ai/logs/.gitkeep
+.ai/status/*
+!.ai/status/.gitkeep
+.ai/outputs/*
+!.ai/outputs/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
