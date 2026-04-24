@@ -111,6 +111,18 @@ case "$AGENT" in
     ;;
 esac
 
+if [[ ! -s "$OUT_FILE" ]]; then
+  echo "Agent produced no output." >> "$LOG_FILE"
+  write_status "failed" "$(date -Iseconds)" "2"
+  exit 2
+fi
+
+if grep -q "Opening authentication page in your browser" "$OUT_FILE"; then
+  echo "Agent requested interactive browser authentication." >> "$LOG_FILE"
+  write_status "failed" "$(date -Iseconds)" "2"
+  exit 2
+fi
+
 STATE="done"
 write_status "done" "$(date -Iseconds)"
 trap - EXIT

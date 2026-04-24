@@ -108,6 +108,13 @@ context window and starts inventing what the others are doing.
 - [ ] Final output written to `.ai/outputs/<task-id>-<agent>.md`.
 - [ ] Changes pushed to GitHub and a PR is opened via `gh pr create`.
 
+## Release Tracking
+
+- Record user-facing changes in `CHANGELOG.md`.
+- Add detailed release records under `.ai/releases/`.
+- Include verification commands, known review gaps, and follow-up tasks.
+- Tag stable template versions with `v<major>.<minor>.<patch>`.
+
 ## Safety and permissions
 
 - Never run destructive commands such as `rm -rf`, database resets, production migrations, credential rotation, or force pushes without explicit human approval.

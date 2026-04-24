@@ -61,6 +61,11 @@ and expected output file.
 that want the same agent workflow without inheriting this repository's runtime
 logs or prior task history.
 
+## Releases
+
+Release history is tracked in `CHANGELOG.md`, with detailed release records in
+`.ai/releases/`.
+
 ## Verification
 
 For app projects, the default Definition of Done is:
